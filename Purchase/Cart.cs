@@ -310,7 +310,7 @@ namespace Webbshop.Purchase
             var shipCity = Console.ReadLine();
             ShippingCity = string.IsNullOrWhiteSpace(shipCity) ? Program.CurrentUser.City : shipCity;
 
-            Console.Write($"Land ({Program.CurrentUser.Country}): ");
+            Console.Write($"Country ({Program.CurrentUser.Country}): ");
             var shipCountry = Console.ReadLine();
             ShippingCountry = string.IsNullOrWhiteSpace(shipCountry) ? Program.CurrentUser.Country : shipCountry;
             once = true;
