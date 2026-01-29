@@ -91,6 +91,8 @@ namespace Webbshop.Purchase
             {
                 tx.Rollback();
                 Console.WriteLine($"Transaction failed: {ex.Message}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"Inner: {ex.InnerException.Message}");
             }
         }
 

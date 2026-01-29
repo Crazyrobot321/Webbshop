@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Webbshop.Entities;
+using Microsoft.Extensions.Configuration;
 
 namespace Webbshop.Data
 {
@@ -13,12 +14,19 @@ namespace Webbshop.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
-        //public object OrderItem { get; internal set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS; Database=Webshop;
-                                       Trusted_Connection=True;TrustServerCertificate=True;");
+            if (!optionsBuilder.IsConfigured)
+            {
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json")
+                    .Build();
+
+                var connString = config.GetConnectionString("DefaultConnection");
+                optionsBuilder.UseSqlServer(connString);
+            }
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,7 +37,6 @@ namespace Webbshop.Data
             OrdersConstraints(modelBuilder);
             OrderItemsConstraints(modelBuilder);
         }
-
         private static void CustomersConstraints(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Customer>()
