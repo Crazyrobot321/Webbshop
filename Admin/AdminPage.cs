@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Webbshop.Data;
 using Webbshop.Entities;
@@ -108,7 +109,14 @@ namespace Webbshop.Admin
                         .ToList();
                     foreach (var o in orders)
                     {
-                        Console.WriteLine($"Order ID: {o.Id} | Date: {o.OrderDate} | Delivery: {o.DeliveryOption} | Payment: {o.PaymentMethod}");
+                        //Calculate total price for the order
+                        decimal total = 0m;
+                        if (o.OrderItems != null && o.OrderItems.Any())
+                        {
+                            total = o.OrderItems.Sum(oi => oi.Quantity * oi.UnitPrice);
+                        }
+
+                        Console.WriteLine($"Order ID: {o.Id} | Date: {o.OrderDate} | Delivery: {o.DeliveryOption} | Payment: {o.PaymentMethod} | Total: {total:0.00} kr");
                         foreach (var oi in o.OrderItems)
                         {
                             Console.WriteLine($"\tProduct: {oi.Product?.Name} | Qty: {oi.Quantity} | Unit Price: {oi.UnitPrice} kr");

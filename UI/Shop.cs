@@ -69,7 +69,7 @@ namespace Webbshop.UI
 
             //Using sql to fetch products in selected category
             var products = context.Products
-                .FromSql($"SELECT * FROM Products WHERE CategoryId = {selectedCategory.Id}")
+                .Where(p => p.CategoryId == selectedCategory.Id)
                 .ToList();
 
             Console.Clear();
