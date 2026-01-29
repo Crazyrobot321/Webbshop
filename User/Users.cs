@@ -13,22 +13,22 @@ namespace Webbshop.User
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("Välj kund:");
+                Console.WriteLine("Choose customer:");
                 for (int i = 0; i < customers.Count; i++)
                 {
                     Console.WriteLine($"{i + 1}. {customers[i].Name}");
                 }
-                Console.Write("Ange kundnummer: ");
+                Console.Write("Input CustomerID: ");
                 if (int.TryParse(Console.ReadLine(), out int customerIndex) && customerIndex >= 1 && customerIndex <= customers.Count)
                 {
                     var selectedCustomer = customers[customerIndex - 1];
-                    Console.WriteLine($"Vald kund: {selectedCustomer.Name}");
+                    Console.WriteLine($"Chosen customer: {selectedCustomer.Name}");
                     Program.CurrentUser = selectedCustomer;
                     break; //Breaks the loop when a valid customer is selected
                 }
                 else
                 {
-                    Console.WriteLine("Ogiltigt kundnummer.");
+                    Console.WriteLine("Invalid CustomerID.");
                     Thread.Sleep(800);
                 }
             }
