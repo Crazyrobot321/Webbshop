@@ -24,11 +24,11 @@ The project focuses on database design and usage, including relationships, const
 Create an `appsettings.json` and place it in \bin\Debug\net10.0 locally to run the application.
 
 Template for appsettings.json:
-'''
+```
 {
   "ConnectionStrings": {
     "DefaultConnection": "YOUR_CONNECTION_STRING_HERE"
   }
 }
-'''
+```
 
