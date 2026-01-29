@@ -28,13 +28,34 @@ namespace Webbshop.UI
             {
                 categoryText.Add($"{i + 1}. {categories[i].Name}");
             }
+            categoryText.Add("[S]. Search products");
             var categoryWindow = new Window("Product Categories", 2, 1, categoryText);
             categoryWindow.Draw();
             Console.SetCursorPosition(1, categoryText.Count + 3);
             Console.WriteLine("Select a number corresponding to the category, or press Enter to cancel");
             Console.Write("Choice: ");
-            var line = Console.ReadLine();
+            var line = Console.ReadLine().ToUpper();
+            line.Trim();
 
+            //Free text search option
+            if (line.Equals("S"))
+            {
+                Console.Clear();
+                Console.Write("Free text search: ");
+                var searchTerm = Console.ReadLine()?.Trim() ?? "";
+
+                var searchResults = context.Products
+                 .Where(p =>
+                     p.Name.Contains(searchTerm) ||
+                     p.Description.Contains(searchTerm))
+                 .ToList();
+
+                Console.WriteLine($"Products matching search ({searchTerm})");
+                foreach (var product in searchResults)
+                    Console.WriteLine($"{product.Name}: {product.Description} - {product.Price} kr");
+                Console.WriteLine("Press any button to return...");
+                Console.ReadKey(true);
+            }
             //Check for invalid input by trying to parse to int and checking range
             if (!int.TryParse(line.Trim(), out int catIndex) || catIndex < 1 || catIndex > categories.Count)
             {
@@ -42,6 +63,7 @@ namespace Webbshop.UI
                 Thread.Sleep(500);
                 return;
             }
+            
 
             var selectedCategory = categories[catIndex - 1];
 
