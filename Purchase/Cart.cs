@@ -17,6 +17,7 @@ namespace Webbshop.Purchase
         public static string? ShippingStreet = null;
         public static string? ShippingCity = null;
         public static string? ShippingCountry = null;
+        private static bool once = false;
 
         public static void DrawSmallCart(MyDbContext context)
         {
@@ -209,50 +210,8 @@ namespace Webbshop.Purchase
             {
                 Console.Clear();
                 DrawCart(context, shipping);
-
-                Console.WriteLine("Fraktuppgifter (tryck Enter för att använda kundens uppgifter)\n");
-
-                Console.Write($"Namn ({Program.CurrentUser.Name}): ");
-                var shipName = Console.ReadLine();
-                ShippingName = string.IsNullOrWhiteSpace(shipName) ? Program.CurrentUser.Name : shipName;
-
-                Console.Write($"Gata ({Program.CurrentUser.Street}): ");
-                var shipStreet = Console.ReadLine();
-                ShippingStreet = string.IsNullOrWhiteSpace(shipStreet) ? Program.CurrentUser.Street : shipStreet;
-
-                Console.Write($"Stad ({Program.CurrentUser.City}): ");
-                var shipCity = Console.ReadLine();
-                ShippingCity = string.IsNullOrWhiteSpace(shipCity) ? Program.CurrentUser.City : shipCity;
-
-                Console.Write($"Land ({Program.CurrentUser.Country}): ");
-                var shipCountry = Console.ReadLine();
-                ShippingCountry = string.IsNullOrWhiteSpace(shipCountry) ? Program.CurrentUser.Country : shipCountry;
-
-                //Console.WriteLine("Fraktuppgifter (lämna tomt för att använda kundens uppgifter)\n");
-
-                //Console.Write($"Namn ({Program.CurrentUser.Name}): ");
-                //var shipName = Console.ReadLine();
-                //if (string.IsNullOrWhiteSpace(shipName)) //Using IsNullOrWhiteSpace to check for empty or whitespace input
-                //    shipName = Program.CurrentUser.Name;
-                //ShippingName = shipName;
-                //Console.Write($"Gata ({Program.CurrentUser.Street}): ");
-                //var shipStreet = Console.ReadLine();
-                //if (string.IsNullOrWhiteSpace(shipStreet))
-                //    shipStreet = Program.CurrentUser.Street;
-                //ShippingStreet = shipStreet;
-
-                //Console.Write($"Stad ({Program.CurrentUser.City}): ");
-                //var shipCity = Console.ReadLine();
-                //if (string.IsNullOrWhiteSpace(shipCity))
-                //    shipCity = Program.CurrentUser.City;
-                //ShippingCity = shipCity;
-
-                //Console.Write($"Land ({Program.CurrentUser.Country}): ");
-                //var shipCountry = Console.ReadLine();
-                //if (string.IsNullOrWhiteSpace(shipCountry))
-                //    shipCountry = Program.CurrentUser.Country;
-                //ShippingCountry = shipCountry;
-
+                UpdateShippingInfo(once);
+                once = true;
                 Console.Clear();
 
                 var currentAddress = new List<String>
@@ -273,7 +232,8 @@ namespace Webbshop.Purchase
                     "1 = Payment",
                     "2 = Shipping",
                     "X = Purchase",
-                    "B = Return"
+                    "B = Return",
+                    "A = Adjust adress"
                 };
                 DrawCart(context, shipping);
                 new Window("Checkout", 60, 8, lines).Draw();
@@ -313,6 +273,10 @@ namespace Webbshop.Purchase
 
                 if (key == ConsoleKey.B)
                     return;
+                if (key == ConsoleKey.A)
+                    once = false;
+                    UpdateShippingInfo(once);
+                    once = true;
 
                 if (key == ConsoleKey.D1)
                     payment = ChoosePayment(context, shipping,out lastFour);
@@ -327,6 +291,29 @@ namespace Webbshop.Purchase
                     return;
                 }
             }
+        }
+        static void UpdateShippingInfo(bool once)
+        {
+            if(once)
+                return;
+            Console.WriteLine("Shipping details (press enter to keep default adress)\n");
+
+            Console.Write($"Name ({Program.CurrentUser.Name}): ");
+            var shipName = Console.ReadLine();
+            ShippingName = string.IsNullOrWhiteSpace(shipName) ? Program.CurrentUser.Name : shipName;
+
+            Console.Write($"Street ({Program.CurrentUser.Street}): ");
+            var shipStreet = Console.ReadLine();
+            ShippingStreet = string.IsNullOrWhiteSpace(shipStreet) ? Program.CurrentUser.Street : shipStreet;
+
+            Console.Write($"City ({Program.CurrentUser.City}): ");
+            var shipCity = Console.ReadLine();
+            ShippingCity = string.IsNullOrWhiteSpace(shipCity) ? Program.CurrentUser.City : shipCity;
+
+            Console.Write($"Land ({Program.CurrentUser.Country}): ");
+            var shipCountry = Console.ReadLine();
+            ShippingCountry = string.IsNullOrWhiteSpace(shipCountry) ? Program.CurrentUser.Country : shipCountry;
+            once = true;
         }
     }
 }
