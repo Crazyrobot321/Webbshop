@@ -20,8 +20,7 @@ namespace Webbshop.UI
                 "",
                 "Choose a product by pressing the corresponding letter"
             };
-            var header = new Window("Startpage", 2, 1, headerText);
-            header.Draw();
+            new Window("Startpage", 2, 1, headerText).Draw();
 
             //Current User
             var currentUserText = new List<string>
@@ -30,9 +29,7 @@ namespace Webbshop.UI
                 $"{Program.CurrentUser.Name}",
                 $"{Program.CurrentUser.Email}"
             };
-            var currentUserWindow = new Window("Customer Information", 65, 1, currentUserText);
-            currentUserWindow.Draw();
-
+            new Window("Customer Information", 65, 1, currentUserText).Draw();
             //Menu
             var customerMenuText = new List<string>
                 {
@@ -41,8 +38,7 @@ namespace Webbshop.UI
                 "3. Cart",
                 "4. Admin Stuff"
             };
-            var customerMenu = new Window("Menu", 2, 7, customerMenuText);
-            customerMenu.Draw();
+            new Window("Menu", 2, 7, customerMenuText).Draw();
 
             //Fetch products which have IsSelected = true
             var startProducts = context.Products
@@ -83,14 +79,7 @@ namespace Webbshop.UI
                     $"Press [{key}] to buy"
                 };
 
-                var productWindow = new Window(
-                    $"Deal {i + 1}",
-                    x,
-                    startY,
-                    productText
-                );
-
-                productWindow.Draw();
+                new Window($"Deal {i + 1}",x,startY,productText).Draw();
             }
 
             //Handling input
@@ -112,6 +101,7 @@ namespace Webbshop.UI
                 {
                     var chosenProduct = startProducts[index];
 
+                    //If product is already in cart, increase amount otherwise add new entry
                     if (Program.cart.ContainsKey(chosenProduct.Id))
                         Program.cart[chosenProduct.Id] += 1;
                     else
@@ -132,6 +122,7 @@ namespace Webbshop.UI
                         //Redraw home page
                         break;
                     case '2':
+                        //Draw shop page
                         UI.Shop.DrawShopPage(context);
                         Thread.Sleep(500);
                         break;
@@ -143,6 +134,7 @@ namespace Webbshop.UI
                         Console.ReadKey(true);
                         break;
                     case '4':
+                        //Draw admin page
                         Admin.AdminPage.DrawAdminPage(context);
                         Console.WriteLine("Press any key to return.");
                         Console.ReadKey(true);

@@ -57,8 +57,7 @@ namespace Webbshop.Purchase
 
             }
 
-            var cartWindow = new Window("Cart", 65, 8, lines);
-            cartWindow.Draw();
+            new Window("Cart", 65, 8, lines).Draw();
         }
 
         public static void DrawCart(MyDbContext context, decimal shipping)
