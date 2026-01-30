@@ -82,9 +82,8 @@ namespace Webbshop.UI
                 new Window("Products", 2, 1, productText).Draw();
                 Console.WriteLine();
                 Console.Write("Choose which product to learn more about: ");
-                string inputRaw = Console.ReadLine() ?? string.Empty;
-                string input = inputRaw.Trim().ToUpperInvariant();
-                // Check for empty input and handle in Results
+                string input = Console.ReadLine().ToUpper();
+                //Check for empty input
                 Results(input, products);
                 Thread.Sleep(500);
                 continue;
@@ -92,14 +91,14 @@ namespace Webbshop.UI
         }
         static void Results(string input, List<Product> products)
         {
-            input = (input ?? string.Empty).Trim().ToUpperInvariant();
+            input = input.Trim();
             if (string.IsNullOrWhiteSpace(input))
             {
                 Console.WriteLine("Invalid choice");
                 Thread.Sleep(500);
                 return;
             }
-            if (input.Equals("B", StringComparison.Ordinal))
+            if (input.Equals("B"))
             {
                 return;
             }
@@ -116,7 +115,7 @@ namespace Webbshop.UI
                 new Window("Product Details", 2, 1, prodDetail).Draw();
                 Console.Write("Add to cart? Y/N: ");
                 var confirmKey = Console.ReadKey(true).KeyChar;
-                if (char.ToUpperInvariant(confirmKey) != 'Y')
+                if (char.ToUpper(confirmKey) != 'Y')
                 {
                     Console.WriteLine("Purchase cancelled, returning...");
                     Thread.Sleep(500);
@@ -128,16 +127,14 @@ namespace Webbshop.UI
                 Console.ReadKey(true);
                 return;
             }
-            Console.WriteLine("Invalid choice");
-            Thread.Sleep(500);
         }
         static void Search(MyDbContext context)
         {
             Console.Clear();
             Console.WriteLine("Type 'exit' to exit search");
             Console.Write("Free text search: ");
-            var searchTerm = Console.ReadLine()?.Trim() ?? string.Empty;
-            if (searchTerm.IndexOf("exit", StringComparison.OrdinalIgnoreCase) >= 0)
+            var searchTerm = Console.ReadLine()?.Trim() ?? "";
+            if (searchTerm.Contains("exit"))
                 return;
             var searchResults = context.Products
              .Where(p =>
@@ -154,8 +151,7 @@ namespace Webbshop.UI
             foundProducts.Add("[B] Go back");
             new Window("Search result", 2, 1, foundProducts).Draw();
             Console.Write("Choose product: ");
-            string choiceRaw = Console.ReadLine() ?? string.Empty;
-            string choice = choiceRaw.Trim().ToUpperInvariant();
+            string choice = Console.ReadLine().ToUpper();
             Results(choice, searchResults);
         }
     }
