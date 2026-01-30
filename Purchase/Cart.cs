@@ -12,6 +12,7 @@ namespace Webbshop.Purchase
     {
         public static decimal shippingCost = 0m;
         public static string? shippingMethod = "";
+        public static string? lastFourDigits = "";
 
         public static string? ShippingName = null;
         public static string? ShippingStreet = null;
@@ -99,9 +100,8 @@ namespace Webbshop.Purchase
             new Window("Cart", 2, 8, lines).Draw();
         }
 
-        public static PaymentOptions ChoosePayment(MyDbContext context, decimal shipping, out string? lastFour)
+        public static PaymentOptions ChoosePayment(MyDbContext context, decimal shipping)
         {
-            lastFour = null;
             while (true)
             {
                 Console.Clear();
@@ -121,7 +121,7 @@ namespace Webbshop.Purchase
 
                 new Window("Payment", 60, 8, lines).Draw();
 
-                if(!int.TryParse(Console.ReadLine(), out int key))
+                if (!int.TryParse(Console.ReadLine(), out int key))
                 {
                     Console.WriteLine("Invalid choice!");
                     continue;
@@ -129,9 +129,28 @@ namespace Webbshop.Purchase
 
                 if (key == 1)
                 {
-                    Console.SetCursorPosition(2, 28);
-                    Console.Write("Enter the last 4 digits of the card: ");
-                    lastFour = Console.ReadLine();
+                    while (true)
+                    {
+                        Console.SetCursorPosition(2, 28);
+                        Console.Write("Enter the last 4 digits of the card: ");
+                        var input = Console.ReadLine()?.Trim();
+
+                        if (string.IsNullOrEmpty(input))
+                        {
+                            Console.WriteLine("Input required. Please enter 4 digits.");
+                            continue;
+                        }
+
+                        if (input.Length != 4 || !input.All(char.IsDigit))
+                        {
+                            Console.WriteLine("Please enter exactly 4 numeric digits.");
+                            continue;
+                        }
+
+                        lastFourDigits = input;
+                        break;
+                    }
+
                     return PaymentOptions.CreditCard;
                 }
                 if (key == 2)
@@ -278,7 +297,7 @@ namespace Webbshop.Purchase
                     once = true;
 
                 if (key == ConsoleKey.D1)
-                    payment = ChoosePayment(context, shipping,out lastFour);
+                    payment = ChoosePayment(context, shipping);
 
                 if (key == ConsoleKey.D2)
                     delivery = ChooseDelivery(context, ref shipping, payment);

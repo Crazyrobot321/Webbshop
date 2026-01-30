@@ -417,7 +417,7 @@ namespace Webbshop.Admin
 
         }
         
-        //Dapper/SQL based statistics viewing
+        //Dapper based statistics viewing
         static void ViewStatistics(MyDbContext context)
         {
             using var conn = new SqlConnection(context.Database.GetConnectionString());
@@ -430,11 +430,11 @@ namespace Webbshop.Admin
                     "2. Top customers by purchase amount",
                     "3. Most sold ordered by category",
                     "4. Orders per customer",
-                    "5. Back"
+                    "5. Detailed information about orders",
+                    "6. Back"
                 };
                 Console.Clear();
-                var statsWindow = new Window("Statistics Menu", 50, 12, queries);
-                statsWindow.Draw();
+                new Window("Statistics Menu", 50, 12, queries).Draw();
                 Console.Write("Choice: ");
                 var input = Console.ReadLine();
                 if (!int.TryParse(input, out int choice))
@@ -458,8 +458,7 @@ namespace Webbshop.Admin
                         {
                             mostSoldList.Add($"{row.Name} – Sold: {row.TotalSold}");
                         }
-                        var mostSoldStatWindow = new Window("Most sold products", 5, 10, mostSoldList);
-                        mostSoldStatWindow.Draw();
+                        new Window("Most sold products", 5, 10, mostSoldList).Draw();
                         Console.ReadKey(true);
                         break;
                     case 2:
@@ -480,8 +479,7 @@ namespace Webbshop.Admin
                         {
                             topCustomersList.Add($"{row.Name} – Spent: {row.TotalSpent} kr");
                         }
-                        var topCustomersStatWindow = new Window("Top Customers by Purchase Amount", 5, 10, topCustomersList);
-                        topCustomersStatWindow.Draw();
+                        new Window("Top Customers by Purchase Amount", 5, 10, topCustomersList).Draw();
                         Console.ReadKey(true);
                         break;
                     case 3:
@@ -502,8 +500,7 @@ namespace Webbshop.Admin
                         {
                             mostSoldByCategoryList.Add($"{row.Category} – Sold: {row.TotalSold}");
                         }
-                        var mostSoldByCategoryStatWindow = new Window("Most sold per category", 5, 10, mostSoldByCategoryList);
-                        mostSoldByCategoryStatWindow.Draw();
+                        new Window("Most sold per category", 5, 10, mostSoldByCategoryList).Draw();
                         Console.ReadKey(true);
                         break;
                     case 4:
@@ -523,11 +520,59 @@ namespace Webbshop.Admin
                         {
                             ordersPerCustomerList.Add($"{row.Name} – Orders: {row.OrderCount}");
                         }
-                        var ordersPerCustomerStatWindow = new Window("Orders per customer", 5, 10, ordersPerCustomerList);
-                        ordersPerCustomerStatWindow.Draw();
+                        new Window("Orders per customer", 5, 10, ordersPerCustomerList).Draw();
                         Console.ReadKey(true);
                         break;
                     case 5:
+                        Console.Clear();
+                        var detailedOrderInformation = new List<string> { };
+                        var detailedOrders = conn.Query(@"SELECT
+                            o.Id AS OrderId,
+                            c.Name AS CustomerName,
+                            CASE o.PaymentMethod
+                                WHEN 1 THEN 'Credit Card'
+                                WHEN 2 THEN 'PayPal'
+                                WHEN 3 THEN 'Bank Transfer'
+                                WHEN 4 THEN 'Klarna'
+                                ELSE 'Unknown'
+                            END AS PaymentMethod,
+                            CASE o.DeliveryOption
+                                WHEN 1 THEN 'Standard'
+                                WHEN 2 THEN 'Express'
+                                WHEN 3 THEN 'In Store PickUp'
+                                WHEN 4 THEN 'Drone'
+                                ELSE 'Unknown'
+                            END AS DeliveryMethod,
+                            STRING_AGG(
+                                p.Name + ' x' + CAST(oi.Quantity AS varchar(10)),
+                                ', '
+                            ) AS Products,
+                            SUM(oi.Quantity * oi.UnitPrice) AS OrderTotal
+                        FROM Orders o
+                        JOIN 
+                            Customers c ON c.Id = o.CustomerId
+                        JOIN 
+                            OrderItem oi ON oi.OrderId = o.Id
+                        JOIN 
+                            Products p ON p.Id = oi.ProductId
+                        GROUP BY
+                            o.Id,
+                            c.Name,
+                            o.PaymentMethod,
+                            o.DeliveryOption
+                        ORDER BY o.Id;");
+                        foreach(var row in detailedOrders)
+                        {
+                            detailedOrderInformation.Add(
+                                $"Order ID: {row.OrderId} | Customer: {row.CustomerName} | " +
+                                $"Payment: {row.PaymentMethod} | Delivery: {row.DeliveryMethod} | " +
+                                $"Products: {row.Products} | Total: {row.OrderTotal} kr"
+                            );
+                        }
+                        new Window("TEST", 1, 1, detailedOrderInformation).Draw();
+                        Console.ReadKey(true);
+                        return;
+                    case 6:
                         return;
                     default:
                         break;

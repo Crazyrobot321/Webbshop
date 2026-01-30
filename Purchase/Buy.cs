@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading;
 using Webbshop.Data;
 using Webbshop.Entities;
 using Webbshop.Enumerables;
@@ -9,7 +10,7 @@ namespace Webbshop.Purchase
 {
     internal class Buy
     {
-        public static void Purchase(MyDbContext context,int customerId,PaymentOptions payment,DeliveryOptions delivery,string? lastFourDigits = null)
+        public static void Purchase(MyDbContext context, int customerId, PaymentOptions payment, DeliveryOptions delivery, string? lastFourDigits = null)
         {
             if (Program.cart.Count == 0)
             {
@@ -27,7 +28,7 @@ namespace Webbshop.Purchase
                     .Where(p => productIds.Contains(p.Id))
                     .ToList();
 
-                //safety check, checks if all products still exist 
+                // safety check, checks if all products still exist 
                 if (products.Count != productIds.Count)
                     throw new Exception("One or more products no longer available.");
 
@@ -47,7 +48,7 @@ namespace Webbshop.Purchase
                     if (product.Price == null)
                         throw new Exception($"Product {product.Name} is missing a price.");
 
-                    // minska lagersaldo
+                    // reduce stock in memory
                     product.Quantity -= qty;
 
                     orderItems.Add(new OrderItem
@@ -65,7 +66,7 @@ namespace Webbshop.Purchase
                     OrderDate = DateTime.Now,
                     PaymentMethod = payment,
                     DeliveryOption = delivery,
-                    LastFourDigits = lastFourDigits,
+                    LastFourDigits = Cart.lastFourDigits,
 
                     ShippingName = Cart.ShippingName,
                     ShippingStreet = Cart.ShippingStreet,
@@ -73,17 +74,23 @@ namespace Webbshop.Purchase
                     ShippingCountry = Cart.ShippingCountry
                 };
 
-                context.Orders.Add(order);
-                context.SaveChanges(); //Need to save to generate order.Id
-
+                // Associate each OrderItem with the Order instance so EF will set FKs on SaveChanges
                 foreach (var oi in orderItems)
-                    oi.OrderId = order.Id;
+                {
+                    oi.Order = order;
+                }
 
+                // Add order and order items to the context, but do NOT SaveChanges until everything is ready.
+                context.Orders.Add(order);
                 context.Set<OrderItem>().AddRange(orderItems);
+
                 context.SaveChanges();
 
                 tx.Commit();
 
+                Console.WriteLine("Press enter to confirm order");
+                Console.ReadLine();
+                Thread.Sleep(1500);
                 Program.cart.Clear();
                 Console.WriteLine("Transaction completed!");
             }

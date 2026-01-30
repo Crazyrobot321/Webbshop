@@ -15,15 +15,19 @@ namespace Webbshop
         public static Customer CurrentUser { get; set; }
         public static void Main()
         {
+            var menuOptions = new List<string>
+            {
+                "Welcome to the Web Shop!",
+                "1. Login as Existing Customer",
+                "2. Create New Customer",
+                "3. Exit"
+            };
             using var context = new MyDbContext();
             while (true)
             {
 
                 Console.Clear();
-                Console.WriteLine("Welcome to the Webshop!");
-                Console.WriteLine("1. Login as Existing Customer");
-                Console.WriteLine("2. Create New Customer");
-                Console.WriteLine("3. Exit");
+                new Window("Welcome", 10, 5, menuOptions).Draw();
                 Console.Write("Please select an option (1-3): ");
                 var choice = Console.ReadLine();
                 switch (choice)
