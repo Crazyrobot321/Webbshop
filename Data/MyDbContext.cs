@@ -17,7 +17,7 @@ namespace Webbshop.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //Uses appsettings.json to get connection string due to security
+            //Uses appsettings.json to get connection string due to security best practices
             if (!optionsBuilder.IsConfigured)
             {
                 var config = new ConfigurationBuilder()
@@ -65,17 +65,17 @@ namespace Webbshop.Data
             modelBuilder.Entity<Customer>()
                 .Property(c => c.Street)
                     .IsRequired()
-                    .HasMaxLength(200);
+                    .HasMaxLength(50);
 
             modelBuilder.Entity<Customer>()
                 .Property(c => c.City)
                     .IsRequired()
-                    .HasMaxLength(100);
+                    .HasMaxLength(50);
 
             modelBuilder.Entity<Customer>()
                 .Property(c => c.Country)
                     .IsRequired()
-                    .HasMaxLength(100);
+                    .HasMaxLength(50);
 
             modelBuilder.Entity<Customer>()
                 .Property(c => c.DateOfBirth)
@@ -91,7 +91,7 @@ namespace Webbshop.Data
             modelBuilder.Entity<Product>()
                  .Property(p => p.Name)
                     .IsRequired()
-                    .HasMaxLength(75);
+                    .HasMaxLength(50);
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)
                     .WithMany(c => c.Products)
@@ -108,32 +108,32 @@ namespace Webbshop.Data
             modelBuilder.Entity<Category>()
                 .Property(c => c.Name)
                     .IsRequired()
-                    .HasMaxLength(100);
+                    .HasMaxLength(20);
         }
         private static void SuppliersConstraints(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Supplier>()
                 .Property(s => s.Name)
                     .IsRequired()
-                    .HasMaxLength(150);
+                    .HasMaxLength(100);
             modelBuilder.Entity<Supplier>()
                 .Property(s => s.ContactEmail)
-                    .HasMaxLength(150);
+                    .HasMaxLength(70);
             modelBuilder.Entity<Supplier>()
                 .Property(s => s.ContactPhone)
                     .HasMaxLength(20);
             modelBuilder.Entity<Supplier>()
                 .Property(s => s.Street)
                     .IsRequired()
-                    .HasMaxLength(200);
+                    .HasMaxLength(50);
             modelBuilder.Entity<Supplier>()
                 .Property(s => s.City)
                     .IsRequired()
-                    .HasMaxLength(100);
+                    .HasMaxLength(50);
             modelBuilder.Entity<Supplier>()
                 .Property(s => s.Country)
                     .IsRequired()
-                    .HasMaxLength(100);
+                    .HasMaxLength(50);
         }
         private static void OrdersConstraints(ModelBuilder modelBuilder)
         {
@@ -156,17 +156,17 @@ namespace Webbshop.Data
             modelBuilder.Entity<Order>()
                 .Property(o => o.ShippingStreet)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Order>()
                 .Property(o => o.ShippingCity)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Order>()
                 .Property(o => o.ShippingCountry)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(50);
         }
         private static void OrderItemsConstraints(ModelBuilder modelBuilder)
         {

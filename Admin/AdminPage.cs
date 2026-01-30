@@ -16,46 +16,98 @@ namespace Webbshop.Admin
     {
         public static void DrawAdminPage(MyDbContext context)
         {
-            Console.Clear();
-            var adminText = new List<string>
+            while (true)
             {
+                Console.Clear();
+                var adminText = new List<string>
+                {
                 "1. Edit Products",
                 "2. Edit Categories",
                 "3. Edit Users",
-                "4. View Statistics"
-            };
-            var adminWindow = new Window("Admin Menu", 40, 10, adminText);
-            adminWindow.Draw();
-            Console.Write("Choice: ");
-            var input = Console.ReadLine();
-            if (!int.TryParse(input, out int choice))
-            {
-                Console.WriteLine("Invalid choice!");
-                return;
-            }
-            else
-            {
-                Console.Clear();
-                switch (choice)
+                "4. View Statistics",
+                "0. Return to Main Menu"
+                };
+                var adminWindow = new Window("Admin Menu", 40, 10, adminText);
+                adminWindow.Draw();
+                Console.Write("Choice: ");
+                var input = Console.ReadLine();
+                if (!int.TryParse(input, out int choice))
                 {
-                    case 1:
-                        AdministrateProducts(context);
-                        break;
-                    case 2:
-                        AdministrateCategories(context);
-                        break;
-                    case 3:
-                        AdministrateUsers(context);
-                        break;
-                    case 4:
-                        ViewStatistics(context);
-                        break;
-                    default:
-                        break;
+                    Console.WriteLine("Invalid choice!");
+                    continue;
                 }
+                else
+                {
+                    Console.Clear();
+                    switch (choice)
+                    {
+                        case 1:
+                            AdministrateProducts(context);
+                            break;
+                        case 2:
+                            AdministrateCategories(context);
+                            break;
+                        case 3:
+                            AdministrateUsers(context);
+                            break;
+                        case 4:
+                            ViewStatistics(context);
+                            break;
+                        case 0:
+                            return;
+                        default:
+                            break;
+                    }
+                }
+
             }
         }
         static void AdministrateCategories(MyDbContext context)
+        {
+            while (true)
+            {
+                Console.Clear();
+                var windowContent = new List<string>
+                {
+                    "1. Add category",
+                    "2. Edit category",
+                    "0. Back"
+                };
+                new Window("Category Administration", 40, 10, windowContent).Draw();
+                Console.Write("Choice: ");
+                var input = Console.ReadLine();
+                //If input is invalid, continue asking for input again
+                if (!int.TryParse(input, out int choice))
+                    continue;
+                switch (choice)
+                {
+                    case 1:
+                        AddCategory(context);
+                        break;
+                    case 2:
+                        EditCategory(context);
+                        break;
+                    case 0:
+                        return;
+                }
+            }
+
+        }
+        static void AddCategory(MyDbContext context)
+        {
+            Console.Clear();
+            Console.Write("Category name: ");
+            var name = Console.ReadLine();
+            var category = new Category
+            {
+                Name = name!
+            };
+            context.Categories.Add(category);
+            context.SaveChanges();
+            Console.WriteLine("Category added.");
+            Console.ReadKey();
+        }
+        static void EditCategory(MyDbContext context)
         {
             Console.Clear();
             var categories = context.Categories.ToList();
@@ -78,29 +130,33 @@ namespace Webbshop.Admin
             context.SaveChanges();
             Console.WriteLine("Category updated.");
             Console.ReadKey();
-
         }
         static void AdministrateUsers(MyDbContext context)
         {
             
-
-            Console.WriteLine("1. View Order History");
-            Console.WriteLine("2. Edit User Information");
+            var windowContent = new List<string>
+            {
+                "1. View Order History",
+                "2. Edit User Information",
+                "0. Back"
+            };
+            new Window("User Administration", 40, 10, windowContent).Draw();
             Console.Write("Choice: ");
             var input = Console.ReadLine();
             //If input is not a valid integer, return
             if (!int.TryParse(input, out int choice))
                 return;
             var customers = context.Customers.ToList();
-            foreach (var c in customers)
-                Console.WriteLine($"[{c.Id}] {c.Name} | {c.Email}");
-
-            Console.Write("Customer ID: ");
-            if (!int.TryParse(Console.ReadLine(), out int custId))
-                return;
+            
             switch (choice)
             {
                 case 1:
+                    foreach (var c in customers)
+                        Console.WriteLine($"[{c.Id}] {c.Name} | {c.Email}");
+
+                    Console.Write("Customer ID: ");
+                    if (!int.TryParse(Console.ReadLine(), out int custId))
+                        return;
                     //EntityFramework
                     var orders = context.Orders
                         .Include(o => o.OrderItems)
@@ -124,7 +180,13 @@ namespace Webbshop.Admin
                     }
                     break;
                 case 2:
-                    var customer = customers.FirstOrDefault(c => c.Id == custId);
+                    foreach (var c in customers)
+                        Console.WriteLine($"[{c.Id}] {c.Name} | {c.Email}");
+
+                    Console.Write("Customer ID: ");
+                    if (!int.TryParse(Console.ReadLine(), out int custId2))
+                        return;
+                    var customer = customers.FirstOrDefault(c => c.Id == custId2);
                     if (customer == null)
                         return;
 
@@ -162,6 +224,8 @@ namespace Webbshop.Admin
                     Console.WriteLine("Customer updated.");
                     Console.ReadKey();
                     break;
+                case 0:
+                    return;
                 default:
                     break;
             }
@@ -223,10 +287,17 @@ namespace Webbshop.Admin
             if (!int.TryParse(Console.ReadLine(), out int qty))
                 return;
 
+            var categories = context.Categories.ToList();
+            Console.WriteLine("Currently available categories: ");
+            foreach (var c in categories)
+                Console.WriteLine($"[{c.Id}] {c.Name}");
             Console.Write("Category ID: ");
             if (!int.TryParse(Console.ReadLine(), out int categoryId))
                 return;
-
+            var supplier = context.Suppliers.ToList();
+            Console.WriteLine("Currently available suppliers: ");
+            foreach (var s in supplier)
+                Console.WriteLine($"[{s.Id}] {s.Name}");
             Console.Write("Supplier ID: ");
             if (!int.TryParse(Console.ReadLine(), out int supplierId))
                 return;
@@ -238,7 +309,8 @@ namespace Webbshop.Admin
                 Price = price,
                 Quantity = qty,
                 CategoryId = categoryId,
-                SupplierId = supplierId
+                SupplierId = supplierId,
+                IsSelected = false
             };
 
             context.Products.Add(product);
@@ -277,10 +349,10 @@ namespace Webbshop.Admin
                 Console.ReadKey();
                 return;
             }
-
+            //Leave field empty to keep current value
+            Console.WriteLine("Leave fields empty to keep current values");
             Console.Write($"Name ({product.Name}): ");
             var name = Console.ReadLine();
-            //If name is not empty, update product name
             if (!string.IsNullOrWhiteSpace(name))
                 product.Name = name;
 
@@ -302,9 +374,18 @@ namespace Webbshop.Admin
             if (bool.TryParse(featuredInput, out bool isSelected))
                 product.IsSelected = isSelected;
 
+            var categories = context.Categories.ToList();
+            Console.WriteLine("Currently available categories: ");
+            foreach (var c in categories)
+                Console.WriteLine($"[{c.Id}] {c.Name}");
             Console.Write($"Category ID ({product.CategoryId}): ");
             if (int.TryParse(Console.ReadLine(), out int catId))
                 product.CategoryId = catId;
+
+            var supplier = context.Suppliers.ToList();
+            Console.WriteLine("Currently available suppliers: ");
+            foreach (var s in supplier)
+                Console.WriteLine($"[{s.Id}] {s.Name}");
 
             Console.Write($"Supplier ID ({product.SupplierId}): ");
             if (int.TryParse(Console.ReadLine(), out int supId))
@@ -320,7 +401,7 @@ namespace Webbshop.Admin
             foreach (var p in products)
                 Console.WriteLine($"[{p.Id}] {p.Name}");
 
-            Console.Write("Product ID to remove: ");
+            Console.Write("Product ID to remove, (or press Enter to return): ");
             if (!int.TryParse(Console.ReadLine(), out int id))
                 return;
 

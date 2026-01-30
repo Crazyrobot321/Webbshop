@@ -17,7 +17,7 @@ namespace Webbshop.Purchase
         public static string? ShippingStreet = null;
         public static string? ShippingCity = null;
         public static string? ShippingCountry = null;
-        private static bool once = false;
+        public static bool once = false;
 
         public static void DrawSmallCart(MyDbContext context)
         {
@@ -291,7 +291,7 @@ namespace Webbshop.Purchase
                 }
             }
         }
-        static void UpdateShippingInfo(bool once)
+        public static void UpdateShippingInfo(bool once)
         {
             if(once)
                 return;

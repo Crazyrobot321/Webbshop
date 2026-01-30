@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using System.Threading;
 using Webbshop.Data;
 using Webbshop.Purchase;
 
@@ -8,6 +10,7 @@ namespace Webbshop.UI
 {
     internal class Home
     {
+        public static bool changeAdr = false;
         public static void DrawHomePage(MyDbContext context)
         {
             Console.Clear();
@@ -24,20 +27,28 @@ namespace Webbshop.UI
 
             //Current User
             var currentUserText = new List<string>
-                {
+            {
                 $"Logged in as:",
                 $"{Program.CurrentUser.Name}",
                 $"{Program.CurrentUser.Email}"
             };
             new Window("Customer Information", 65, 1, currentUserText).Draw();
-            //Menu
+
+            //Menu - show admin option only for admins
             var customerMenuText = new List<string>
-                {
+            {
                 "1. Startpage",
                 "2. The shop",
                 "3. Cart",
-                "4. Admin Stuff"
+                "4. Change user / logout",
+                "5. Change adress",
             };
+
+            if (Program.CurrentUser != null && Program.CurrentUser.UserType == 1)
+            {
+                customerMenuText.Add("6. Admin Stuff");
+            }
+
             new Window("Menu", 2, 7, customerMenuText).Draw();
 
             //Fetch products which have IsSelected = true
@@ -79,7 +90,7 @@ namespace Webbshop.UI
                     $"Press [{key}] to buy"
                 };
 
-                new Window($"Deal {i + 1}",x,startY,productText).Draw();
+                new Window($"Deal {i + 1}", x, startY, productText).Draw();
             }
 
             //Handling input
@@ -92,12 +103,12 @@ namespace Webbshop.UI
                 char input = char.ToUpper(key2);
                 int index = input - 'A';
 
-                if (key2 == 'x')
+                if (char.ToUpper(key2) == 'X')
                 {
                     Purchase.Cart.Checkout(context);
                     Console.ReadLine();
                 }
-                if (index >= 0 && index < startProducts.Count)
+                else if (index >= 0 && index < startProducts.Count)
                 {
                     var chosenProduct = startProducts[index];
 
@@ -134,12 +145,27 @@ namespace Webbshop.UI
                         Console.ReadKey(true);
                         break;
                     case '4':
-                        //Draw admin page
-                        Admin.AdminPage.DrawAdminPage(context);
-                        Console.WriteLine("Press any key to return.");
-                        Console.ReadKey(true);
+                        Console.Clear();
+                        Program.cart.Clear();
+                        Program.Main();
                         break;
                     case '5':
+                        Purchase.Cart.once = false;
+                        Purchase.Cart.UpdateShippingInfo(Purchase.Cart.once);
+                        Purchase.Cart.once = true;
+                        break;
+                    case '6':
+                        //Only allow admin page for admins
+                        if (Program.CurrentUser != null && Program.CurrentUser.UserType == 1)
+                        {
+                            Admin.AdminPage.DrawAdminPage(context);
+                            Thread.Sleep(500);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid choice, only available for admins");
+                            Thread.Sleep(500);
+                        }
                         break;
                     default:
                         Console.WriteLine("Invalid choice");

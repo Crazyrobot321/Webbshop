@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading;
 using Webbshop.Data;
 
 namespace Webbshop.User
@@ -16,7 +16,8 @@ namespace Webbshop.User
                 Console.WriteLine("Choose customer:");
                 for (int i = 0; i < customers.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {customers[i].Name}");
+                    var typeLabel = GetUserTypeLabel(customers[i].UserType);
+                    Console.WriteLine($"{i + 1}. {customers[i].Name}, user type: {typeLabel}");
                 }
                 Console.Write("Input CustomerID: ");
                 if (int.TryParse(Console.ReadLine(), out int customerIndex) && customerIndex >= 1 && customerIndex <= customers.Count)
@@ -32,6 +33,20 @@ namespace Webbshop.User
                     Thread.Sleep(800);
                 }
             }
+        }
+
+        private static string GetUserTypeLabel(object userTypeObj)
+        {
+            var asString = userTypeObj.ToString();
+
+            //Maps enum names to labels to improve readability
+            if (int.TryParse(asString, out int numeric))
+            {
+                return numeric == 1 ? "Admin" : "User";
+            }
+
+            // Fallback to the raw string representation
+            return asString = "Unkown";
         }
     }
 }

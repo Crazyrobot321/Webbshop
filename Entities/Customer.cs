@@ -11,6 +11,7 @@ namespace Webbshop.Entities
         public required string Email { get; set; }
         public required string MobileNr { get; set; }
         public required DateTime DateOfBirth { get; set; }
+        public required int UserType { get; set; } //0 = Regular, 1 = Admin
 
         //Adressen
         public required string Street { get; set; }
