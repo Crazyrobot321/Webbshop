@@ -17,7 +17,7 @@ namespace Webbshop.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //Uses appsettings.json to get connection string due to security best practices
+            //Uses appsettings.json to get connection string due to security practices
             if (!optionsBuilder.IsConfigured)
             {
                 var config = new ConfigurationBuilder()
